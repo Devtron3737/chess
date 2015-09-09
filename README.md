@@ -1,19 +1,36 @@
 # Ruby Cursor Input
 
-This is just a quick repository I cooked up to demo cursor input for
-Ruby console games. The nuts and bolts of getting input were taken
-almost completely from [this gist][cursor-gist]. The rest is just a
-bare-bones game that I think encapsulates the core behavior in a pretty
-reasonable way.
-
-Clone the repo, `ruby lib/game.rb`, and fill some boxes! The most
-important bits live in the [display][display] and
-[cursorable][cursorable] files.
-
-[cursor-gist]: https://gist.github.com/acook/4190379
-[cursorable]: ./lib/cursorable.rb
-[display]: ./lib/display.rb
+TO DO LIST
 
 
-Finding valid moves of pawn, which is based on .
-Were passing all thye possible move arrays to route_checker, and having board check the route.
+refactor to have scan_pieces function in board class
+see app acad solutions, had a method for returning all the boards pieces
+    should take a proc (to select certain kinds of pieces, like black for ex)
+    and return array of pieces (each piece should have position stored in it)
+
+include errors for moving your piece when its not your turn, right now you can
+move any piece whenever, regardless of who current player is
+
+add update_pieces_attr method in board class
+    this should iterate through board, and reinitialize each piece (necessary?)
+
+also dont forget to update
+
+refactor to have moves not take an argument, but just be called on self
+
+figure out bracket methods, and refactor everything so it looks clean
+
+create errors
+
+make private methods private
+  private methods of a class can NEVER be called on anything outside of its class, even self
+  this is because private methods cant have an explicit receiver
+  they have to be called with just the name, ex: populate
+  NOT grid.populate, or self.populate
+  therefore, private methods are those that just help out the public methods in that class
+  your internals of a class dont recieve or pass messages to other classes
+  they only work for the public  methods of its own class
+
+add curser highlighting for possible moves
+
+mess with board colors a bit

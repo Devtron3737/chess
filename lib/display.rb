@@ -37,6 +37,6 @@ class Display
 
   def render
     system("clear")
-    build_grid.each { |row| puts row.join }
+    build_grid.each_with_index { |row, index| puts row.join }
   end
 end
