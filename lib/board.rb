@@ -46,11 +46,10 @@ class Board
 
   end
 
-
-
   def move_piece(start_pos, end_pos)
 
     piece = self[start_pos]
+    debugger
     # if piece.color != turn_color
       # raise 'You must move your own piece'
     if !piece.moves(start_pos).include?(end_pos)
@@ -144,7 +143,8 @@ class Board
     self[[0, 1]] = Knight.new("black",[0,1], self)
     self[[0, 6]] = Knight.new("black",[0,6], self)
     #bishop
-    self[[0, 2]] = Bishop.new("black",[0,2], self)
+    # self[[0, 2]] = Bishop.new("black",[0,2], self)
+    self[[3, 3]] = Bishop.new("black",[3,3], self) #test pos
     self[[0, 5]] = Bishop.new("black",[0,5], self)
     #queen
     self[[0, 3]] = Queen.new("black",[0,3], self)

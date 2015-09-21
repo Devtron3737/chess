@@ -8,6 +8,8 @@ see app acad solutions, had a method for returning all the boards pieces
     should take a proc (to select certain kinds of pieces, like black for ex)
     and return array of pieces (each piece should have position stored in it)
 
+Rescue errors! so allow player to choose another move if they try to make an invalid one
+
 include errors for moving your piece when its not your turn, right now you can
 move any piece whenever, regardless of who current player is
 
@@ -17,8 +19,6 @@ add update_pieces_attr method in board class
 also dont forget to update
 
 refactor to have moves not take an argument, but just be called on self
-
-figure out bracket methods, and refactor everything so it looks clean
 
 create errors
 

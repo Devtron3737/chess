@@ -1,4 +1,4 @@
-require_relative 'module'
+require_relative 'move_module'
 require 'byebug'
 
 class Piece
@@ -25,10 +25,7 @@ class Piece
 
   def valid_moves(start_pos)
       pos_moves = []
-      color = self.color
-
-
-      self.moves(start_pos).each do |move|
+      moves(start_pos).each do |move|
         board_copy = board.dup
         board_copy.move_piece!(start_pos, move)
         pos_moves << move unless board_copy.in_check?(color)
@@ -43,6 +40,27 @@ class Piece
 
   def dup(new_board)
     self.class.new(color, pos.dup, new_board)
+  end
+
+  def out_bounds_or_own?(position)
+    !board.in_bounds?(position) || own_color?(position)
+  end
+
+  def own_color?(position)
+    board[position].color == self.color
+  end
+
+  def enemy?(position)
+    # debugger
+    if board[position].is_a?(NullPiece)
+      false
+    elsif !board.in_bounds?(position)
+      false
+    elsif board[position].color == self.color
+      false
+    else
+      true
+    end
   end
 end
 
@@ -61,57 +79,76 @@ class Pawn < Piece
     color == "white" ? " \u2659 " : " \u265f "
   end
 
-  MOVE_UP = [[2,0],[1,0]]
-  DIAG = [[1, -1], [1, 1]]
   def moves(start_pos)
-    moves = []
-    # debugger
-    MOVE_UP.each do |pos|
-      #change pawn's moved instance variable after being moved
-      next if self.moved
-      # debugger
-      if self.color == "black"
-        row_idx = pos.first + start_pos.first
-        col_idx = pos.last + start_pos.last
+    pawn_vertical_moves(start_pos).concat(pawn_diagonal_moves(start_pos))
+  end
 
-        moves += [[row_idx, col_idx]] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].is_a?(NullPiece)
-      else
-        row_idx = pos.first - start_pos.first
-        col_idx = pos.last - start_pos.last
-        moves += [[row_idx, col_idx]] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].is_a?(NullPiece)
-      end
-    end
-    if moved
-      DIAG.each do |pos|
-        if self.color == "black"
-          row_idx = pos.first + start_pos.first
-          col_idx = pos.last + start_pos.first
-          moves += [[row_idx, col_idx]] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].color != self.color
-        else
-          row_idx = pos.first - start_pos.first
-          col_idx = pos.last - start_pos.first
-          moves += [[row_idx, col_idx]] if board.in_bounds?([row_idx, col_idx]) && board.grid[row_idx][col_idx].color != self.color
-        end
-      end
-    end
+  def pawn_vertical_moves(start_pos)
+    moves = []
+    diff = vertical_diff_determiner
+    row_idx = diff.first + start_pos.first
+    col_idx = start_pos.last
+    new_position = [row_idx, col_idx]
+    moves = [new_position] if in_bounds_and_null_space?(new_position)
+    moves += first_move_bonus(start_pos, diff) unless moved == true
     moves
   end
 
+  def vertical_diff_determiner
+    case color
+      when "black"
+        diff = [1, 0]
+      when "white"
+        diff = [-1, 0]
+    end
+    diff
+  end
 
+  def in_bounds_and_null_space?(position)
+    board.in_bounds?(position) && board[position].is_a?(NullPiece)
+  end
+
+  def first_move_bonus(start_pos, diff)
+    row_idx, col_idx = start_pos.first, start_pos.last
+    new_row_idx = row_idx + (diff.first * 2)
+    new_position = [new_row_idx, col_idx]
+    return [new_position] if in_bounds_and_null_space?(new_position)
+    []
+  end
+
+  def pawn_diagonal_moves(position)
+    row_idx, col_idx = position.first, position.last
+    diff = diangonal_diff_determiner
+    positions = diff.map do |diag_pos|
+        new_row_idx = row_idx + diag_pos.first
+        new_col_idx = col_idx + diag_pos.last
+        new_position = [new_row_idx, new_col_idx]
+        next unless enemy?(new_position)
+        diag_pos = new_position
+    end
+    positions.select { |pos| !pos.nil? }
+  end
+
+  def diangonal_diff_determiner
+    case color
+      when "black"
+        diff = [[1, 1], [1, -1]]
+      when "white"
+        diff = [[-1, 1], [-1, -1]]
+    end
+    diff
+  end
 end
 
 class Bishop < Piece
   include SlidingPiece
+
   def to_s
     color == "white" ? " \u2657 " : " \u265d "
   end
 
   def moves(start_pos)
-    pos_moves = []
-    DIAG_MOVES_DIFF.each do |dirc|
-      pos_moves += slide_moves(start_pos, dirc)
-    end
-    pos_moves
+    DIAG_MOVES_DIFF.map { |dirc| slide_moves(start_pos, dirc) }.flatten(1)
   end
 end
 
@@ -123,11 +160,19 @@ class Rook < Piece
   end
 
   def moves(start_pos)
-    pos_moves = []
-    NORMAL_MOVES_DIFF.each do |dirc|
-      pos_moves += slide_moves(start_pos, dirc)
-    end
-    pos_moves
+    NORMAL_MOVES_DIFF.map { |dirc| slide_moves(start_pos, dirc) }.flatten(1)
+  end
+end
+
+class Queen < Piece
+  include SlidingPiece
+
+  def to_s
+    color == "white" ? " \u2655 " : " \u265b "
+  end
+
+  def moves(start_pos)
+    (DIAG_MOVES_DIFF + NORMAL_MOVES_DIFF).map { |dirc| slide_moves(start_pos, dirc) }.flatten(1)
   end
 end
 
@@ -142,21 +187,7 @@ class Knight < Piece
   end
 end
 
-class Queen < Piece
-  include SlidingPiece
-  def to_s
-    color == "white" ? " \u2655 " : " \u265b "
-  end
-    #print out pos moves without in_check or end_pos check
-  def moves(start_pos)
-    pos_moves = []
-    (DIAG_MOVES_DIFF + NORMAL_MOVES_DIFF).each do |dirc|
-      pos_moves += slide_moves(start_pos, dirc)
-    end
-    pos_moves
-  end
 
-end
 
 class King < Piece
   include SteppingPiece
