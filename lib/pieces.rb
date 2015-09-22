@@ -1,0 +1,5 @@
+require_relative 'pieces/piece'
+require_relative 'pieces/pawn'
+require_relative 'pieces/power_pieces'
+require_relative 'pieces/steppable'
+require_relative 'pieces/slidable'
