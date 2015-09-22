@@ -23,7 +23,7 @@ class Display
   end
 
   def reset!
-    notifications.delete(:error)
+    @notifications = Hash.new
   end
 
   def remove_check!
@@ -43,7 +43,7 @@ class Display
   end
 
   def potential_move?(pos)
-    board[@cursor_pos].valid_moves(@cursor_pos).include?(pos)
+    board[@cursor_pos].moves(@cursor_pos).include?(pos)
   end
 
   def build_row(row, row_idx)
@@ -56,7 +56,7 @@ class Display
   def colors_for(i, j)
     if [i, j] == @cursor_pos
       bg = :light_red
-    elsif potential_move?([i, j]) && same_color?
+    elsif same_color? && potential_move?([i, j])
       bg = :light_yellow
     elsif (i + j).odd?
       bg = :light_black

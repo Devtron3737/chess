@@ -20,10 +20,11 @@ class Game
     until game_over?
       begin
         selected_pos = @current_player.move_curser
+        action_notify(selected_pos)
         set_pos = @current_player.move_curser
         board.move_piece(selected_pos, set_pos)
         swap_player!
-        notify
+        check_notify
       rescue StandardError => e
         error_procedure(e)
         retry
@@ -56,7 +57,15 @@ class Game
     end
   end
 
-  def notify
+  def action_notify(position)
+    piece = board[position]
+    display.notifications["#{piece}"] = "#{piece} selected"
+    display.render
+    sleep 1
+    display.reset!
+  end
+
+  def check_notify
     if board.in_check?(@current_player.color)
       display.set_check!
       display.render
