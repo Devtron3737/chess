@@ -10,8 +10,7 @@ module Slidable
     until out_bounds_or_own?(next_position)
       moves += [next_position]
       break if enemy?(next_position)
-      new_position = add_diff(next_position, dirc)
-      next_position = new_position
+      next_position = add_diff(next_position, dirc)
     end
       moves
   end
