@@ -16,7 +16,7 @@
 
 Navigate to the lib directory from the command line, and run:
 
- ruby game.rb
+ 'ruby game.rb'
 
 Use the arrow keys to scroll, and spacebar to select and place a piece.
 The clear pieces start!
