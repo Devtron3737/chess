@@ -21,5 +21,4 @@ Navigate to the lib directory from the command line, and run:
 Use the arrow keys to scroll, and spacebar to select and place a piece.
 The clear pieces start!
 
-
-this is change 2!!
+this is change 3!!
